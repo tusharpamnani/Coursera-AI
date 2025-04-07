@@ -2,12 +2,19 @@
   // Extract quiz data from Coursera
   function extractCourseraQuiz() {
     const questions = [];
-    const quizTitle = document.querySelector('h1')?.textContent.trim() || "Coursera Quiz";
+    // Updated selector to match the HTML structure you shared
+    const quizTitle = document.querySelector('h1.css-6pmrmn')?.textContent.trim() || "Coursera Quiz";
 
-    const questionElements = document.querySelectorAll('[data-test="assessment-question"]');
+    // You may need to update this selector based on Coursera's actual question markup
+    const questionElements = document.querySelectorAll('[data-test="assessment-question"], [data-testid="assessment-question"]');
 
     questionElements.forEach((el, index) => {
-      const text = el.querySelector('[data-test="question-prompt"]')?.textContent.trim() || `Question ${index + 1}`;
+      // Updated selectors to be more specific to Coursera's structure
+      const text = el.querySelector('[data-test="question-prompt"], [data-testid="question-prompt"]')?.textContent.trim() 
+                  || el.querySelector('.question-prompt')?.textContent.trim()
+                  || `Question ${index + 1}`;
+      
+      // Determine question type based on input elements
       const type = el.querySelector('textarea') ? "paragraph"
                   : el.querySelector('input[type="text"]') ? "shortAnswer"
                   : el.querySelectorAll('input[type="radio"]').length ? "multipleChoice"
@@ -16,7 +23,8 @@
 
       let options = [];
       if (type === "multipleChoice" || type === "checkboxes") {
-        const optionElements = el.querySelectorAll('[data-test^="option-"]');
+        // Updated selectors for option elements
+        const optionElements = el.querySelectorAll('[data-test^="option-"], [data-testid^="option-"], .option-item');
         optionElements.forEach((optEl, idx) => {
           const optText = optEl.textContent.trim();
           options.push({
@@ -36,6 +44,7 @@
 
     return { title: quizTitle, questions };
   }
+
 
   // Parse Gemini response
   function parseGeminiResponse(response) {
